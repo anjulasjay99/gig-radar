@@ -6,7 +6,14 @@ import { primaryColor } from "../theme/variables";
 
 const EventCard = ({ data }) => {
   return (
-    <Div p={5} shadow="xs" bg="white" rounded="xl" style={styles.container}>
+    <Div
+      p={5}
+      my={10}
+      shadow="xs"
+      bg="white"
+      rounded="xl"
+      style={styles.container}
+    >
       <Div>
         <Image
           h={150}
@@ -25,7 +32,7 @@ const EventCard = ({ data }) => {
           px={12}
         >
           <Text color="gray900" fontSize="xl" fontWeight="bold">
-            {moment(data.date).format("DD")}
+            {moment(data.date, "DD/MM/YYYY").format("DD")}
           </Text>
           <Text
             color="gray900"
@@ -33,7 +40,7 @@ const EventCard = ({ data }) => {
             fontWeight="medium"
             textTransform="uppercase"
           >
-            {moment(data.date).format("MMM")}
+            {moment(data.date, "DD/MM/YYYY").format("MMM")}
           </Text>
         </Div>
       </Div>

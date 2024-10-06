@@ -4,6 +4,8 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Button, Icon, Div, Fab, Text } from "react-native-magnus";
@@ -15,14 +17,17 @@ import { primaryColor } from "../theme/variables";
 
 const Home = ({ navigation }) => {
   const [events, setevents] = useState([]);
+  const [refreshing, setrefreshing] = useState(false);
 
   const getEvents = async () => {
+    setrefreshing(true);
     const snap = await getDocs(collection(db, "events"));
     let arr = [];
     snap.forEach((doc) => {
       arr.push(doc.data());
     });
     setevents(arr);
+    setrefreshing(false);
   };
 
   const onPressCreateNewEvent = () => {
@@ -34,12 +39,23 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={commonStyles.container}>
-      {events.length > 0
-        ? events.map((data, i) => {
-            return <EventCard key={i} data={data} />;
-          })
-        : null}
+    <SafeAreaView style={[commonStyles.container, { paddingHorizontal: 0 }]}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 20 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => getEvents()}
+          />
+        }
+      >
+        {events.length > 0
+          ? events.map((data, i) => {
+              return <EventCard key={i} data={data} />;
+            })
+          : null}
+      </ScrollView>
       <Fab bg={primaryColor}>
         <Button
           p="none"

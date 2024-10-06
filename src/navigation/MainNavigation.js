@@ -4,6 +4,7 @@ import Home from "../screens/Home";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NewEvent from "../screens/NewEvent";
+import SelectEventLocation from "../screens/SelectEventLocation";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,10 @@ const MainNavigation = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="NewEvent" component={NewEvent} />
+        <Stack.Screen
+          name="SelectEventLocation"
+          component={SelectEventLocation}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

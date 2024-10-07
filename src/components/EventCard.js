@@ -4,7 +4,10 @@ import { Div, Image, Text, Icon, Button, Tag } from "react-native-magnus";
 import moment from "moment";
 import { primaryColor } from "../theme/variables";
 
-const EventCard = ({ data }) => {
+const EventCard = ({ data, navigation }) => {
+  const onPressReadMe = () => {
+    navigation.navigate("ViewEvent", { data });
+  };
   return (
     <Div
       p={5}
@@ -19,7 +22,7 @@ const EventCard = ({ data }) => {
           h={150}
           style={styles.poster}
           rounded="xl"
-          source={require("../../assets/1316.jpg")}
+          source={{ uri: data.poster }}
         />
         <Div
           style={styles.dateWrapper}
@@ -135,6 +138,7 @@ const EventCard = ({ data }) => {
           underlayColor="purple900"
           rounded="xl"
           w={"100%"}
+          onPress={onPressReadMe}
         >
           <Text color="white" fontSize={16} fontWeight="bold">
             Read More

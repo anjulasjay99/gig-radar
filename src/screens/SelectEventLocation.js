@@ -68,12 +68,6 @@ const SelectEventLocation = ({ navigation, route }) => {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           };
-          setPosition(cor);
-          if (mapRef.current) {
-            mapRef.current.fitToCoordinates([cor], {
-              edgePadding: { top: 300, bottom: 300, left: 300, right: 300 },
-            });
-          }
         }
       );
     })();

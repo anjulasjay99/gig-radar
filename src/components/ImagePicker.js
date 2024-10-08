@@ -93,8 +93,8 @@ function ImagePickerView({ img, onImageChange }) {
 
   useEffect(() => {
     setimage(img);
-    console.log("rrr", img);
-  }, []);
+    console.log("image", img);
+  }, [img]);
 
   return (
     <View style={styles.container}>

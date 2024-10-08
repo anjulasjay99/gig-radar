@@ -1,13 +1,22 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Div, Image, Text, Icon, Button, Tag } from "react-native-magnus";
 import moment from "moment";
 import { primaryColor } from "../theme/variables";
+import ImageView from "react-native-image-viewing";
 
-const EventCard = ({ data, navigation }) => {
+const EventCard = ({ data, editable, navigation, onDelete }) => {
+  const [email, setemail] = useState("abcd1234");
+  const [showImageViewer, setshowImageViewer] = useState(false);
+
   const onPressReadMe = () => {
     navigation.navigate("ViewEvent", { data });
   };
+
+  const onPressEdit = () => {
+    navigation.navigate("EditEvent", { data });
+  };
+
   return (
     <Div
       p={5}
@@ -18,12 +27,22 @@ const EventCard = ({ data, navigation }) => {
       style={styles.container}
     >
       <Div>
-        <Image
-          h={150}
-          style={styles.poster}
-          rounded="xl"
-          source={{ uri: data.poster }}
+        <Pressable onPress={() => setshowImageViewer(true)}>
+          <Image
+            h={150}
+            style={styles.poster}
+            rounded="xl"
+            source={{ uri: data.poster }}
+          />
+        </Pressable>
+
+        <ImageView
+          images={[{ uri: data.poster }]}
+          imageIndex={0}
+          visible={showImageViewer}
+          onRequestClose={() => setshowImageViewer(false)}
         />
+
         <Div
           style={styles.dateWrapper}
           bg="white"
@@ -145,6 +164,63 @@ const EventCard = ({ data, navigation }) => {
           </Text>
         </Button>
       </Div>
+
+      {editable && (
+        <Div row justifyContent="space-between" mt={0}>
+          <Button
+            mt="sm"
+            px="xl"
+            py="lg"
+            borderWidth={1}
+            borderColor={primaryColor}
+            bg="white"
+            color="white"
+            underlayColor="purple100"
+            rounded="xl"
+            w={"49%"}
+            prefix={
+              <Icon
+                name="edit"
+                fontSize={16}
+                fontFamily="AntDesign"
+                mr="md"
+                color={primaryColor}
+              />
+            }
+            onPress={onPressEdit}
+          >
+            <Text color={primaryColor} fontSize={16} fontWeight="bold">
+              Edit
+            </Text>
+          </Button>
+          <Button
+            mt="sm"
+            px="xl"
+            py="lg"
+            bg={"red500"}
+            borderWidth={1}
+            borderColor={"red500"}
+            color="white"
+            underlayColor="red600"
+            rounded="xl"
+            w={"49%"}
+            prefix={
+              <Icon
+                name="delete"
+                fontSize={16}
+                fontFamily="AntDesign"
+                mr="md"
+                color={"white"}
+              />
+            }
+            onPress={() => onDelete(data.id)}
+          >
+            <Text color="white" fontSize={16} fontWeight="bold">
+              Delete
+            </Text>
+          </Button>
+        </Div>
+      )}
     </Div>
   );
 };

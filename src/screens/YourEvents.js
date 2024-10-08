@@ -6,48 +6,70 @@ import {
   Dimensions,
   ScrollView,
   RefreshControl,
+  ToastAndroid,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Button, Icon, Div, Fab, Text } from "react-native-magnus";
+import { Button, Icon, Div, Fab, Text, Overlay } from "react-native-magnus";
 import { styles as commonStyles } from "../theme/commonStyles";
 import EventCard from "../components/EventCard";
 import { getDocs, collection, query } from "firebase/firestore";
 import { db } from "../../configs/firbase";
 import { primaryColor, primaryTextColor } from "../theme/variables";
-import { isEventWithinRange } from "../utils/calculateDistance";
-import { getAddress, getLocation } from "../utils/locationService";
+import { deleteDoc, doc } from "firebase/firestore";
 
-const Home = ({ navigation }) => {
-  const [location, setlocation] = useState(null);
+const YourEvents = ({ navigation }) => {
+  const [email, setemail] = useState("abcd1234");
   const [events, setevents] = useState([]);
   const [refreshing, setrefreshing] = useState(false);
-  const [address, setaddress] = useState("");
+  const [isLoading, setisLoading] = useState(false);
 
   const getEvents = async () => {
     setrefreshing(true);
     const snap = await getDocs(collection(db, "events"));
 
-    const userLocation = await getLocation();
-
-    setlocation(userLocation);
-
     let arr = [];
     snap.forEach((doc) => {
-      if (
-        userLocation &&
-        isEventWithinRange(
-          userLocation.lat,
-          userLocation.long,
-          doc.data().venue.lat,
-          doc.data().venue.long,
-          50
-        )
-      ) {
+      if (doc.data().email === email) {
         arr.push({ id: doc.id, ...doc.data() });
       }
     });
     setevents(arr);
     setrefreshing(false);
+  };
+
+  const onPressDelete = (id) => {
+    Alert.alert(
+      "Delete Event",
+      "Are you sure you want to delete this event?",
+      [
+        {
+          text: "Yes",
+          onPress: () => deleteEvent(id),
+        },
+        {
+          text: "No",
+        },
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+
+  const deleteEvent = (id) => {
+    setisLoading(true);
+    deleteDoc(doc(db, "events", id))
+      .then(() => {
+        setisLoading(false);
+        getEvents();
+      })
+      .catch((err) => {
+        setisLoading(false);
+        console.log(err);
+        ToastAndroid.show("Error Deleting Event!", ToastAndroid.SHORT);
+      });
   };
 
   const onPressCreateNewEvent = () => {
@@ -58,29 +80,14 @@ const Home = ({ navigation }) => {
     getEvents();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const userAddr = await getAddress(location);
-      setaddress(userAddr);
-    })();
-  }, [location]);
-
   return (
     <SafeAreaView style={[commonStyles.container, styles.container]}>
-      {address !== "" && (
-        <Div row px={20} mt={10} mb={10}>
-          <Icon
-            name="location-outline"
-            fontFamily="Ionicons"
-            fontSize="2xl"
-            mr={5}
-            color="green500"
-          />
-          <Text fontSize="md" color={primaryTextColor}>
-            {address}
-          </Text>
-        </Div>
-      )}
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator color={primaryColor} />
+        <Text mt="md" textAlign="center">
+          Please wait...
+        </Text>
+      </Overlay>
       <ScrollView
         contentContainerStyle={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -93,7 +100,15 @@ const Home = ({ navigation }) => {
       >
         {events.length > 0
           ? events.map((data, i) => {
-              return <EventCard key={i} data={data} navigation={navigation} />;
+              return (
+                <EventCard
+                  key={i}
+                  data={data}
+                  navigation={navigation}
+                  editable={true}
+                  onDelete={onPressDelete}
+                />
+              );
             })
           : null}
       </ScrollView>
@@ -128,4 +143,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 });
-export default Home;
+export default YourEvents;

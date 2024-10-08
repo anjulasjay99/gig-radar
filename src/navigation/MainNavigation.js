@@ -7,6 +7,7 @@ import NewEvent from "../screens/NewEvent";
 import SelectEventLocation from "../screens/SelectEventLocation";
 import DrawerNavigation from "./DrawerNavigation";
 import ViewEvent from "../screens/ViewEvent";
+import EditEvent from "../screens/EditEvent";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,17 @@ const MainNavigation = () => {
           component={ViewEvent}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EditEvent"
+          component={EditEvent}
+          options={{
+            headerShadowVisible: false,
+            title: "Edit Event",
+            headerTitleStyle: {
+              fontSize: 26,
+            },
           }}
         />
       </Stack.Navigator>

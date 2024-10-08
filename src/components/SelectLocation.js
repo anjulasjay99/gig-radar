@@ -4,7 +4,7 @@ import { Text, Div, Icon, Button } from "react-native-magnus";
 import { primaryColor, primaryTextColor } from "../theme/variables";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
-const SelectLocation = ({ setLocation, navigation }) => {
+const SelectLocation = ({ location, setLocation, navigation }) => {
   const [venue, setvenue] = useState(null);
   const mapRef = useRef(null);
 
@@ -34,6 +34,10 @@ const SelectLocation = ({ setLocation, navigation }) => {
     }
     setLocation(venue);
   }, [venue]);
+
+  useEffect(() => {
+    setvenue(location);
+  }, [location]);
 
   return venue ? (
     <View>

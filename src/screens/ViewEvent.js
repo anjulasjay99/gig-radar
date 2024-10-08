@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Button, Div, Icon, Image, Tag, Text } from "react-native-magnus";
 import { primaryTextColor } from "../theme/variables";
+import ImageView from "react-native-image-viewing";
 import moment from "moment";
 
 function ViewEvent({ route }) {
   const [event, setevent] = useState(null);
+  const [showImageViewer, setshowImageViewer] = useState(false);
 
   useEffect(() => {
     setevent(route.params.data);
@@ -16,7 +18,17 @@ function ViewEvent({ route }) {
       {event && (
         <Div>
           <Div h={220} w={"100%"}>
-            <Image h={220} w={"100%"} source={{ uri: event.poster }} />
+            <Pressable onPress={() => setshowImageViewer(true)}>
+              <Image h={220} w={"100%"} source={{ uri: event.poster }} />
+            </Pressable>
+
+            <ImageView
+              images={[{ uri: event.poster }]}
+              imageIndex={0}
+              visible={showImageViewer}
+              onRequestClose={() => setshowImageViewer(false)}
+            />
+
             <Div style={styles.roundedDiv}></Div>
           </Div>
           <Div px={20}>

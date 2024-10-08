@@ -120,7 +120,7 @@ const EditEvent = ({ navigation, route }) => {
           freeEntry,
           fee: freeEntry ? 0 : fee,
           description,
-          attending: 0,
+          attending: route.params.data.attending,
         })
           .then(() => {
             ToastAndroid.show("Event Updated!", ToastAndroid.SHORT);

@@ -68,6 +68,10 @@ const SelectEventLocation = ({ navigation, route }) => {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           };
+          mapRef.current.animateCamera({
+            center: cor,
+            zoom: 15, // Zoom level (0 is the farthest, higher values zoom in)
+          });
         }
       );
     })();

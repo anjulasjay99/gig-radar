@@ -8,6 +8,7 @@ import SelectEventLocation from "../screens/SelectEventLocation";
 import DrawerNavigation from "./DrawerNavigation";
 import ViewEvent from "../screens/ViewEvent";
 import EditEvent from "../screens/EditEvent";
+import ShowOnMap from "../screens/ShowOnMap";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,17 @@ const MainNavigation = () => {
           options={{
             headerShadowVisible: false,
             title: "Edit Event",
+            headerTitleStyle: {
+              fontSize: 26,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="ShowOnMap"
+          component={ShowOnMap}
+          options={{
+            headerShadowVisible: false,
+            title: "Map View",
             headerTitleStyle: {
               fontSize: 26,
             },

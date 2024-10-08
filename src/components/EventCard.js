@@ -116,7 +116,7 @@ const EventCard = ({ data, editable, navigation, onDelete }) => {
             color="white"
           />
           <Text color="white" fontSize={12}>
-            {data.attending} attending
+            {data.attending.length} attending
           </Text>
         </Tag>
         <Div row>

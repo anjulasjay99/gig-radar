@@ -25,15 +25,13 @@ const SelectLocation = ({ location, setLocation, navigation }) => {
 
   useEffect(() => {
     if (mapRef.current) {
-      mapRef.current.fitToCoordinates([
-        {
-          latitude: venue.lat,
-          longitude: venue.long,
-        },
-      ]);
+      mapRef.current.animateCamera({
+        center: { latitude: venue.lat, longitude: venue.long },
+        zoom: 0, // Zoom level (0 is the farthest, higher values zoom in)
+      });
     }
     setLocation(venue);
-  }, [venue]);
+  }, [venue, mapRef.current]);
 
   useEffect(() => {
     setvenue(location);

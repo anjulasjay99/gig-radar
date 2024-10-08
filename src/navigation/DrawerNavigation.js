@@ -3,6 +3,8 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import Home from "../screens/Home";
 import YourEvents from "../screens/YourEvents";
+import AttendingEvents from "../screens/AttendingEvents";
+import EventsMapView from "../screens/EventsMapView";
 
 const Drawer = createDrawerNavigator();
 
@@ -15,6 +17,28 @@ function DrawerNavigation() {
         options={{
           headerShadowVisible: false,
           title: "Near You",
+          headerTitleStyle: {
+            fontSize: 26,
+          },
+        }}
+      />
+      <Drawer.Screen
+        name="EventsMapView"
+        component={EventsMapView}
+        options={{
+          headerShadowVisible: false,
+          title: "Map View",
+          headerTitleStyle: {
+            fontSize: 26,
+          },
+        }}
+      />
+      <Drawer.Screen
+        name="AttendingEvents"
+        component={AttendingEvents}
+        options={{
+          headerShadowVisible: false,
+          title: "Attending",
           headerTitleStyle: {
             fontSize: 26,
           },

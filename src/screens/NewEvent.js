@@ -116,7 +116,7 @@ const NewEvent = ({ navigation }) => {
           freeEntry,
           fee: freeEntry ? 0 : fee,
           description,
-          attending: 0,
+          attending: [],
         })
           .then(() => {
             ToastAndroid.show("Event Created!", ToastAndroid.SHORT);

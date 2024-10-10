@@ -5,6 +5,7 @@ import Home from "../screens/Home";
 import YourEvents from "../screens/YourEvents";
 import AttendingEvents from "../screens/AttendingEvents";
 import EventsMapView from "../screens/EventsMapView";
+import Logout from "../screens/Logout";
 
 const Drawer = createDrawerNavigator();
 
@@ -53,6 +54,13 @@ function DrawerNavigation() {
           headerTitleStyle: {
             fontSize: 26,
           },
+        }}
+      />
+      <Drawer.Screen
+        name="Logout"
+        component={Logout}
+        options={{
+          headerShown: false,
         }}
       />
     </Drawer.Navigator>

@@ -18,6 +18,8 @@ import { isEventWithinRange } from "../utils/calculateDistance";
 import { getAddress, getLocation } from "../utils/locationService";
 import { useDispatch } from "react-redux";
 import { clearState } from "../redux/actions";
+import NothingToShowHere from "../components/NothingToShowHere";
+import EventCardSkeleton from "../components/EventCardSkeleton";
 
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -95,11 +97,19 @@ const Home = ({ navigation }) => {
           />
         }
       >
-        {events.length > 0
-          ? events.map((data, i) => {
-              return <EventCard key={i} data={data} navigation={navigation} />;
-            })
-          : null}
+        {events.length > 0 ? (
+          events.map((data, i) => {
+            return <EventCard key={i} data={data} navigation={navigation} />;
+          })
+        ) : refreshing ? (
+          <>
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+          </>
+        ) : (
+          <NothingToShowHere />
+        )}
       </ScrollView>
       <Fab bg={primaryColor}>
         <Button

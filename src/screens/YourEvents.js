@@ -20,6 +20,8 @@ import { primaryColor, primaryTextColor } from "../theme/variables";
 import { deleteDoc, doc } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
+import NothingToShowHere from "../components/NothingToShowHere";
+import EventCardSkeleton from "../components/EventCardSkeleton";
 
 const YourEvents = ({ navigation }) => {
   const user = useSelector((state) => state.user);
@@ -107,19 +109,27 @@ const YourEvents = ({ navigation }) => {
           />
         }
       >
-        {events.length > 0
-          ? events.map((data, i) => {
-              return (
-                <EventCard
-                  key={i}
-                  data={data}
-                  navigation={navigation}
-                  editable={true}
-                  onDelete={onPressDelete}
-                />
-              );
-            })
-          : null}
+        {events.length > 0 ? (
+          events.map((data, i) => {
+            return (
+              <EventCard
+                key={i}
+                data={data}
+                navigation={navigation}
+                editable={true}
+                onDelete={onPressDelete}
+              />
+            );
+          })
+        ) : refreshing ? (
+          <>
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+          </>
+        ) : (
+          <NothingToShowHere />
+        )}
       </ScrollView>
       <Fab bg={primaryColor}>
         <Button

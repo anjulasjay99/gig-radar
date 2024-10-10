@@ -22,6 +22,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkConnectivity } from "../utils/connectivity";
 import { useIsFocused } from "@react-navigation/native";
 import { addAttending, clearState, updateAttending } from "../redux/actions";
+import NothingToShowHere from "../components/NothingToShowHere";
+import EventCardSkeleton from "../components/EventCardSkeleton";
 
 const AttendingEvents = ({ navigation }) => {
   const user = useSelector((state) => state.user);
@@ -91,18 +93,26 @@ const AttendingEvents = ({ navigation }) => {
           />
         }
       >
-        {events.length > 0
-          ? events.map((data, i) => {
-              return (
-                <EventCard
-                  key={i}
-                  data={data}
-                  navigation={navigation}
-                  editable={false}
-                />
-              );
-            })
-          : null}
+        {events.length > 0 ? (
+          events.map((data, i) => {
+            return (
+              <EventCard
+                key={i}
+                data={data}
+                navigation={navigation}
+                editable={false}
+              />
+            );
+          })
+        ) : refreshing ? (
+          <>
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+          </>
+        ) : (
+          <NothingToShowHere />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

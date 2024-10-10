@@ -8,7 +8,7 @@ import {
   RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Button, Icon, Div, Fab, Text } from "react-native-magnus";
+import { Button, Icon, Div, Fab, Text, Skeleton } from "react-native-magnus";
 import { styles as commonStyles } from "../theme/commonStyles";
 import EventCard from "../components/EventCard";
 import { getDocs, collection, query } from "firebase/firestore";
@@ -26,7 +26,7 @@ const Home = ({ navigation }) => {
   const [location, setlocation] = useState(null);
   const [events, setevents] = useState([]);
   const [refreshing, setrefreshing] = useState(false);
-  const [address, setaddress] = useState("");
+  const [address, setaddress] = useState(null);
 
   const getEvents = async () => {
     setrefreshing(true);
@@ -73,7 +73,7 @@ const Home = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[commonStyles.container, styles.container]}>
-      {address !== "" && (
+      {address ? (
         <Div row px={20} mt={10} mb={10}>
           <Icon
             name="location-outline"
@@ -85,6 +85,10 @@ const Home = ({ navigation }) => {
           <Text fontSize="md" color={primaryTextColor}>
             {address}
           </Text>
+        </Div>
+      ) : (
+        <Div col px={20} mt={10} mb={10}>
+          <Skeleton.Box />
         </Div>
       )}
       <ScrollView

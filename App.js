@@ -9,9 +9,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./src/redux/store";
 import { LogBox } from "react-native";
 
-LogBox.ignoreLogs([
-  "Non-serializable values were found in the navigation state",
-]);
+LogBox.ignoreAllLogs();
 
 export default function App() {
   return (

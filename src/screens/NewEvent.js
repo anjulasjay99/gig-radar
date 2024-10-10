@@ -222,6 +222,7 @@ const NewEvent = ({ navigation }) => {
                 setpickerDate(params.date);
                 setdatePickerOpen(false);
               }}
+              selectedItemColor="#9f7aea"
             />
           </Modal>
           <DateTimeInputHandler

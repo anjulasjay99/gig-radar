@@ -34,8 +34,11 @@ import {
 } from "firebase/storage";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../configs/firbase";
+import { useSelector } from "react-redux";
 
 const EditEvent = ({ navigation, route }) => {
+  const user = useSelector((state) => state.user);
+
   const [coverImage, setcoverImage] = useState("");
   const [eventName, seteventName] = useState("");
 
@@ -110,7 +113,7 @@ const EditEvent = ({ navigation, route }) => {
       setisLoading(true);
       uploadImage((url) => {
         updateDoc(doc(db, "events", route.params.data.id), {
-          email: "abcd1234",
+          uid: route.params.data.uid,
           name: eventName,
           date,
           startTime,
@@ -121,6 +124,7 @@ const EditEvent = ({ navigation, route }) => {
           fee: freeEntry ? 0 : fee,
           description,
           attending: route.params.data.attending,
+          likes: route.params.data.likes,
         })
           .then(() => {
             ToastAndroid.show("Event Updated!", ToastAndroid.SHORT);

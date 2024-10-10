@@ -16,8 +16,11 @@ import { db } from "../../configs/firbase";
 import { primaryColor, primaryTextColor } from "../theme/variables";
 import { isEventWithinRange } from "../utils/calculateDistance";
 import { getAddress, getLocation } from "../utils/locationService";
+import { useDispatch } from "react-redux";
+import { clearState } from "../redux/actions";
 
 const Home = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [location, setlocation] = useState(null);
   const [events, setevents] = useState([]);
   const [refreshing, setrefreshing] = useState(false);
@@ -55,6 +58,7 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
+    //dispatch(clearState());
     getEvents();
   }, []);
 

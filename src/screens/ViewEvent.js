@@ -22,21 +22,27 @@ import ImageView from "react-native-image-viewing";
 import moment from "moment";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../configs/firbase";
+import { useDispatch, useSelector } from "react-redux";
+import { addAttending, removeAttending } from "../redux/actions";
 
 function ViewEvent({ navigation, route }) {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
   const [event, setevent] = useState(null);
   const [showImageViewer, setshowImageViewer] = useState(false);
   const [isLoading, setisLoading] = useState(false);
   const [willAttend, setwillAttend] = useState(false);
+  const [isLiked, setisLiked] = useState(false);
 
   const updateAttending = (isAttending) => {
     let arr = event.attending;
 
     if (isAttending) {
-      arr.push("abcd1234");
+      arr.push(user.uid);
     } else {
-      const user = arr.indexOf("abcd1234");
-      arr.splice(user, 1);
+      const usr = arr.indexOf(user.uid);
+      arr.splice(usr, 1);
     }
 
     updateEvent(arr);
@@ -45,7 +51,7 @@ function ViewEvent({ navigation, route }) {
   const updateEvent = (attending) => {
     setisLoading(true);
     updateDoc(doc(db, "events", event.id), {
-      email: "abcd1234",
+      uid: event.uid,
       name: event.name,
       date: event.date,
       startTime: event.startTime,
@@ -56,16 +62,91 @@ function ViewEvent({ navigation, route }) {
       fee: event.fee,
       description: event.description,
       attending,
+      likes: event.likes,
     })
       .then(() => {
         setisLoading(false);
-        attending.includes("abcd1234")
-          ? setwillAttend(true)
-          : setwillAttend(false);
+        if (attending.includes(user.uid)) {
+          dispatch(
+            addAttending({
+              id: event.id,
+              uid: event.uid,
+              name: event.name,
+              date: event.date,
+              startTime: event.startTime,
+              endTime: event.endTime,
+              venue: event.venue,
+              poster: event.poster,
+              freeEntry: event.freeEntry,
+              fee: event.fee,
+              description: event.description,
+              attending,
+              likes: event.likes,
+            })
+          );
+          setwillAttend(true);
+        } else {
+          dispatch(
+            removeAttending({
+              id: event.id,
+              uid: event.uid,
+              name: event.name,
+              date: event.date,
+              startTime: event.startTime,
+              endTime: event.endTime,
+              venue: event.venue,
+              poster: event.poster,
+              freeEntry: event.freeEntry,
+              fee: event.fee,
+              description: event.description,
+              attending,
+              likes: event.likes,
+            })
+          );
+          setwillAttend(false);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setisLoading(false);
+        ToastAndroid.show("Error!", ToastAndroid.SHORT);
+      });
+  };
+
+  const onPressLike = () => {
+    let arr = event.likes;
+
+    if (!isLiked) {
+      arr.push(user.uid);
+    } else {
+      const usr = arr.indexOf(user.uid);
+      arr.splice(usr, 1);
+    }
+    console.log(arr);
+    updateEventLikes(arr);
+  };
+
+  const updateEventLikes = (likes) => {
+    updateDoc(doc(db, "events", event.id), {
+      uid: event.uid,
+      name: event.name,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      venue: event.venue,
+      poster: event.poster,
+      freeEntry: event.freeEntry,
+      fee: event.fee,
+      description: event.description,
+      attending: event.attending,
+      likes,
+    })
+      .then(() => {
+        likes.includes(user.uid) ? setisLiked(true) : setisLiked(false);
       })
       .catch((err) => {
         console.log(err);
-        setisLoading(false);
+
         ToastAndroid.show("Error!", ToastAndroid.SHORT);
       });
   };
@@ -79,8 +160,14 @@ function ViewEvent({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    if (event && event.attending.includes("abcd1234")) {
-      setwillAttend(true);
+    if (event) {
+      if (event.attending.includes(user.uid)) {
+        setwillAttend(true);
+      }
+
+      if (event && event.likes.includes(user.uid)) {
+        setisLiked(true);
+      }
     }
   }, [event]);
 
@@ -124,18 +211,28 @@ function ViewEvent({ navigation, route }) {
             <Div style={styles.roundedDiv}></Div>
           </Div>
           <Div px={20}>
-            <Tag bg="green500">
-              <Icon
-                name="people-outline"
-                fontFamily="Ionicons"
-                fontSize={14}
-                mr={5}
-                color="white"
-              />
-              <Text color="white" fontSize={12}>
-                {event.attending.length} attending
-              </Text>
-            </Tag>
+            <Div row justifyContent="space-between">
+              <Tag bg="green500">
+                <Icon
+                  name="people-outline"
+                  fontFamily="Ionicons"
+                  fontSize={14}
+                  mr={5}
+                  color="white"
+                />
+                <Text color="white" fontSize={12}>
+                  {event.attending.length} attending
+                </Text>
+              </Tag>
+              <Button bg="white" p={0} onPress={onPressLike}>
+                <Icon
+                  fontFamily="Ionicons"
+                  name={isLiked ? "heart" : "heart-outline"}
+                  color={isLiked ? "pink500" : "gray900"}
+                  fontSize={26}
+                />
+              </Button>
+            </Div>
             <Div mt={15}>
               <Text fontSize="5xl" fontWeight="bold" color={primaryTextColor}>
                 {event.name}

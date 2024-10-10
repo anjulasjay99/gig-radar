@@ -18,9 +18,12 @@ import { getDocs, collection, query } from "firebase/firestore";
 import { db } from "../../configs/firbase";
 import { primaryColor, primaryTextColor } from "../theme/variables";
 import { deleteDoc, doc } from "firebase/firestore";
+import { useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 
 const YourEvents = ({ navigation }) => {
-  const [email, setemail] = useState("abcd1234");
+  const user = useSelector((state) => state.user);
+  const isFocused = useIsFocused();
   const [events, setevents] = useState([]);
   const [refreshing, setrefreshing] = useState(false);
   const [isLoading, setisLoading] = useState(false);
@@ -31,7 +34,7 @@ const YourEvents = ({ navigation }) => {
 
     let arr = [];
     snap.forEach((doc) => {
-      if (doc.data().email === email) {
+      if (doc.data().uid === user.uid) {
         arr.push({ id: doc.id, ...doc.data() });
       }
     });
@@ -79,6 +82,12 @@ const YourEvents = ({ navigation }) => {
   useEffect(() => {
     getEvents();
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      getEvents();
+    }
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={[commonStyles.container, styles.container]}>

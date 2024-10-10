@@ -18,29 +18,66 @@ import { getDocs, collection, query } from "firebase/firestore";
 import { db } from "../../configs/firbase";
 import { primaryColor, primaryTextColor } from "../theme/variables";
 import { deleteDoc, doc } from "firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { checkConnectivity } from "../utils/connectivity";
+import { useIsFocused } from "@react-navigation/native";
+import { addAttending, clearState, updateAttending } from "../redux/actions";
 
 const AttendingEvents = ({ navigation }) => {
-  const [email, setemail] = useState("abcd1234");
+  const user = useSelector((state) => state.user);
+  const attending = useSelector((state) => state.attending);
+  const isFocused = useIsFocused();
+  const dispatch = useDispatch();
   const [events, setevents] = useState([]);
   const [refreshing, setrefreshing] = useState(false);
 
   const getEvents = async () => {
     setrefreshing(true);
-    const snap = await getDocs(collection(db, "events"));
+    const net = await checkConnectivity();
+    if (net.isConnected) {
+      try {
+        const snap = await getDocs(collection(db, "events"));
 
-    let arr = [];
-    snap.forEach((doc) => {
-      if (doc.data().attending.includes(email)) {
-        arr.push({ id: doc.id, ...doc.data() });
+        let arr = [];
+        snap.forEach((doc) => {
+          if (doc.data().attending.includes(user.uid)) {
+            arr.push({ id: doc.id, ...doc.data() });
+          }
+        });
+
+        attending.forEach((item) => {
+          let exists = false;
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i].id === item.id) {
+              exists = true;
+            }
+          }
+
+          if (!exists) {
+            arr.push({ ...item, isCancelled: true });
+          }
+        });
+
+        setevents(arr);
+        dispatch(updateAttending(arr));
+        setrefreshing(false);
+      } catch (err) {
+        console.error(err);
+        setrefreshing(false);
       }
-    });
-    setevents(arr);
-    setrefreshing(false);
+    } else {
+      setevents(attending);
+      setrefreshing(false);
+    }
   };
 
   useEffect(() => {
     getEvents();
   }, []);
+
+  useEffect(() => {
+    isFocused && getEvents();
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={[commonStyles.container, styles.container]}>

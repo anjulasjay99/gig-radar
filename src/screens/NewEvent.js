@@ -34,8 +34,11 @@ import {
 } from "firebase/storage";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../configs/firbase";
+import { useDispatch, useSelector } from "react-redux";
 
 const NewEvent = ({ navigation }) => {
+  const user = useSelector((state) => state.user);
+
   const [coverImage, setcoverImage] = useState("");
   const [eventName, seteventName] = useState("");
 
@@ -106,7 +109,7 @@ const NewEvent = ({ navigation }) => {
       setisLoading(true);
       uploadImage((url) => {
         addDoc(collection(db, "events"), {
-          email: "abcd1234",
+          uid: user.uid,
           name: eventName,
           date,
           startTime,
@@ -117,6 +120,7 @@ const NewEvent = ({ navigation }) => {
           fee: freeEntry ? 0 : fee,
           description,
           attending: [],
+          likes: [],
         })
           .then(() => {
             ToastAndroid.show("Event Created!", ToastAndroid.SHORT);

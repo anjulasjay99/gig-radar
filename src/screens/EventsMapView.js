@@ -9,8 +9,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../configs/firbase";
 import { getLocation } from "../utils/locationService";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { useIsFocused } from "@react-navigation/native";
 
 const EventsMapView = ({ navigation, route }) => {
+  const isFocused = useIsFocused();
   const [position, setPosition] = useState({
     latitude: 10,
     longitude: 10,
@@ -47,6 +49,12 @@ const EventsMapView = ({ navigation, route }) => {
   useEffect(() => {
     getEvents();
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      getEvents();
+    }
+  }, [isFocused]);
 
   /* useEffect(() => {
     if (markersRef.current) {

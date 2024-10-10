@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import axios from "axios";
 import { Button, Text, Div, Icon } from "react-native-magnus";
 import { primaryColor, primaryTextColor } from "../theme/variables";
+import { getLocation } from "../utils/locationService";
 
 const SelectEventLocation = ({ navigation, route }) => {
   const [position, setPosition] = useState({
@@ -51,29 +52,38 @@ const SelectEventLocation = ({ navigation, route }) => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-      foregroundSubscrition = Location.watchPositionAsync(
-        {
-          // Tracking options
-          accuracy: Location.Accuracy.High,
-          distanceInterval: 10,
-        },
-        (location) => {
-          console.log(location);
-          let cor = {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          };
-          mapRef.current.animateCamera({
-            center: cor,
-            zoom: 15, // Zoom level (0 is the farthest, higher values zoom in)
-          });
-        }
-      );
+      // let { status } = await Location.requestForegroundPermissionsAsync();
+      // if (status !== "granted") {
+      //   setErrorMsg("Permission to access location was denied");
+      //   return;
+      // }
+      // foregroundSubscrition = Location.watchPositionAsync(
+      //   {
+      //     // Tracking options
+      //     accuracy: Location.Accuracy.High,
+      //     distanceInterval: 10,
+      //   },
+      //   (location) => {
+      //     console.log(location);
+      //     let cor = {
+      //       latitude: location.coords.latitude,
+      //       longitude: location.coords.longitude,
+      //     };
+      //     mapRef.current.animateCamera({
+      //       center: cor,
+      //       zoom: 15, // Zoom level (0 is the farthest, higher values zoom in)
+      //     });
+      //   }
+      // );
+      const userLocation = await getLocation();
+      let cor = {
+        latitude: userLocation.lat,
+        longitude: userLocation.long,
+      };
+      mapRef.current.animateCamera({
+        center: cor,
+        zoom: 15, // Zoom level (0 is the farthest, higher values zoom in)
+      });
     })();
   }, []);
   return (

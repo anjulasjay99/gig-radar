@@ -32,15 +32,17 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../configs/firbase";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-const NewEvent = ({ navigation }) => {
+const EditEvent = ({ navigation, route }) => {
   const user = useSelector((state) => state.user);
 
   const [coverImage, setcoverImage] = useState("");
   const [eventName, seteventName] = useState("");
+
+  const [coverImageChanged, setcoverImageChanged] = useState(false);
 
   const [date, setDate] = useState("");
   const [pickerDate, setpickerDate] = useState(new Date());
@@ -98,6 +100,8 @@ const NewEvent = ({ navigation }) => {
       fee
     );
     if (
+      coverImage !== "" &&
+      coverImage &&
       eventName !== "" &&
       location &&
       date !== "" &&
@@ -108,8 +112,8 @@ const NewEvent = ({ navigation }) => {
     ) {
       setisLoading(true);
       uploadImage((url) => {
-        addDoc(collection(db, "events"), {
-          uid: user.uid,
+        updateDoc(doc(db, "events", route.params.data.id), {
+          uid: route.params.data.uid,
           name: eventName,
           date,
           startTime,
@@ -119,18 +123,18 @@ const NewEvent = ({ navigation }) => {
           freeEntry,
           fee: freeEntry ? 0 : fee,
           description,
-          attending: [],
-          likes: [],
+          attending: route.params.data.attending,
+          likes: route.params.data.likes,
         })
           .then(() => {
-            ToastAndroid.show("Event Created!", ToastAndroid.SHORT);
+            ToastAndroid.show("Event Updated!", ToastAndroid.SHORT);
             setisLoading(false);
             navigation.goBack();
           })
           .catch((err) => {
             console.log(err);
             setisLoading(false);
-            ToastAndroid.show("Error Submitting Event!", ToastAndroid.SHORT);
+            ToastAndroid.show("Error Updating Event!", ToastAndroid.SHORT);
           });
       });
     } else {
@@ -141,26 +145,33 @@ const NewEvent = ({ navigation }) => {
   //called to upload selected image to firebase storage
   const uploadImage = async (callback) => {
     if (coverImage) {
-      const response = await fetch(coverImage);
-      const blob = await response.blob();
-      console.log(coverImage.split("/").pop());
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${coverImage.split("/").pop()}`);
+      if (coverImageChanged) {
+        const response = await fetch(coverImage);
+        const blob = await response.blob();
+        console.log(coverImage.split("/").pop());
+        const storage = getStorage();
+        const storageRef = ref(
+          storage,
+          `images/${coverImage.split("/").pop()}`
+        );
 
-      const uploadTask = uploadBytesResumable(storageRef, blob);
+        const uploadTask = uploadBytesResumable(storageRef, blob);
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {},
-        (error) => {
-          ToastAndroid.show("Error Submitting Event!", ToastAndroid.SHORT);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            callback(downloadURL);
-          });
-        }
-      );
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {},
+          (error) => {
+            ToastAndroid.show("Error Submitting Event!", ToastAndroid.SHORT);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              callback(downloadURL);
+            });
+          }
+        );
+      } else {
+        callback(coverImage);
+      }
     } else {
       callback("");
     }
@@ -178,6 +189,19 @@ const NewEvent = ({ navigation }) => {
     setNewEndTime(pickerEndTime);
   }, [pickerEndTime]);
 
+  useEffect(() => {
+    console.log("id", route.params.data.id);
+    setcoverImage(route.params.data.poster);
+    seteventName(route.params.data.name);
+    setDate(route.params.data.date);
+    setstartTime(route.params.data.startTime);
+    setendTime(route.params.data.endTime);
+    setlocation(route.params.data.venue);
+    setdescription(route.params.data.description);
+    setfee(route.params.data.fee);
+    setfreeEntry(route.params.data.freeEntry);
+  }, []);
+
   return (
     <View
       style={[commonStyles.container, { paddingTop: 0, paddingHorizontal: 0 }]}
@@ -190,7 +214,14 @@ const NewEvent = ({ navigation }) => {
       </Overlay>
       <ScrollView style={commonStyles.scrollView}>
         <Div my={5} mt={20}>
-          <ImagePickerView onImageChange={setcoverImage} />
+          <ImagePickerView
+            img={coverImage}
+            onImageChange={(img) => {
+              console.log(img);
+              setcoverImage(img);
+              setcoverImageChanged(true);
+            }}
+          />
         </Div>
         <Div my={5}>
           <Input
@@ -341,7 +372,11 @@ const NewEvent = ({ navigation }) => {
           </Div>
         </Div>
         <Div my={5}>
-          <SelectLocation setLocation={setlocation} navigation={navigation} />
+          <SelectLocation
+            location={location}
+            setLocation={setlocation}
+            navigation={navigation}
+          />
         </Div>
         <Div my={5}>
           <Div row my={5}>
@@ -397,7 +432,7 @@ const NewEvent = ({ navigation }) => {
             onPress={onSubmit}
           >
             <Text color="white" fontSize={16} fontWeight="bold">
-              Create Event
+              Update Event
             </Text>
           </Button>
         </Div>
@@ -406,4 +441,4 @@ const NewEvent = ({ navigation }) => {
   );
 };
 
-export default NewEvent;
+export default EditEvent;

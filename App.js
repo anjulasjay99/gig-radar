@@ -4,11 +4,20 @@ import SelectEventLocation from "./src/screens/SelectEventLocation";
 import Home from "./src/screens/Home";
 import { ThemeProvider } from "react-native-magnus";
 import MainNavigation from "./src/navigation/MainNavigation";
+import DrawerNavigation from "./src/navigation/DrawerNavigation";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { store } from "./src/redux/store";
+import { LogBox } from "react-native";
+
+LogBox.ignoreAllLogs();
+
 export default function App() {
   return (
     <ThemeProvider>
-      <MainNavigation />
-      <StatusBar style="auto" />
+      <Provider store={store}>
+        <MainNavigation />
+        <StatusBar style="auto" />
+      </Provider>
     </ThemeProvider>
   );
 }
